@@ -1,7 +1,8 @@
 "use strict";
 import 'core-js';
 import * as THREE from 'three';
-import EffectComposer, { RenderPass, ShaderPass, CopyShader, DotScreenShader, RGBShiftShader } from 'three-effectcomposer-es6'
+import EffectComposer, { RenderPass, ShaderPass, CopyShader, DotScreenShader, RGBShiftShader }
+from 'three-effectcomposer-es6'
 
 
 import texture_file from '../img/logo03.png';
