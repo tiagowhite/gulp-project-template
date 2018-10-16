@@ -38,7 +38,7 @@ const styles = () => {
     .pipe($.if(argv.pretty, $.sourcemaps.init()))
     .pipe($.sass({
       precision: 10,
-      includePaths: ['.app/css/'],
+      includePaths: ['app/css/**/*', 'node_modules/flexboxgrid'],
     }).on('error', $.sass.logError))
     .pipe($.autoprefixer(config.autoprefixer_options))
     .pipe(cleanCSS({debug: true}, (details) => {

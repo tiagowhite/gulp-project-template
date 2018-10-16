@@ -1,0 +1,90 @@
+body,
+html {
+  height: 100%;
+  background-color: $site-background-color;
+}
+
+body {
+  font-family: $font-family-monospace;
+  font-weight: 300;
+  font-size: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  margin: 5vh 5vh;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+header > .name > h1 { font-size: 15px; color: $pink-base; float: left; margin: 0; padding: 0;}
+header > .logo { width: 200px; text-align: center;  margin: 0 auto; display: flex; }
+
+header > nav > ul {
+  float: right;
+  position: relative;
+  margin: 0;
+  padding: 0;
+
+}
+header > nav > ul > li { display: inline-block; margin-left: 20px; }
+header > nav > ul > li > a {
+  display: block;
+  padding: 10px 0;
+  position: relative;
+  transition: color .35s ease
+}
+header > nav > ul > li > a {
+  display: inline-block;
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+  transition: -webkit-transform .3s cubic-bezier(.694,.048,.335,1);
+  transition: transform .3s cubic-bezier(.694,.048,.335,1);
+  transition: transform .3s cubic-bezier(.694,.048,.335,1),-webkit-transform .3s cubic-bezier(.694,.048,.335,1)
+}
+header > nav > ul > li > a { fill: #b0b2c3; transition: all .25s }
+
+header > nav > ul > li > a:before {
+  background-color: #f2dda9;
+  transition: all .25s cubic-bezier(.694,.048,.335,1) .15s
+}
+header > nav > ul > li > a:after,
+header > nav > ul > li > a:before {
+  content: "";
+  position: absolute;
+  top: 20px;
+  right: 0;
+  left: auto;
+  width: 0;
+  height: 3px;
+  z-index: 2
+}
+
+header > nav > ul > li > a:after {
+  background-color: #e05977;
+  transition: all .25s cubic-bezier(.694,.048,.335,1)
+}
+
+header > nav > ul > li > a { color: $pink-base; text-decoration: none; margin: 0; padding: 0; transition: color .35s ease;}
+header > nav > ul > li > a:hover { color: $yellow-text; transform: translateX(0);}
+
+@media only screen and (min-width: 64em) {
+  header > nav > ul > li > a:hover:after, header > nav > ul > li > a:hover:before {
+    width:100%;
+    left: 0;
+  }
+}
+
+footer {
+  width: auto;
+  height: 50px;
+  margin: 0 auto;
+
+  p {
+    text-align: center
+  }
+
+}
