@@ -47,6 +47,7 @@ const styles = () => {
     }))
     .pipe($.size({title: 'Styles'}))
     .pipe($.header(banner, {pkg}))
+    .pipe($.concat(config.css_file_name))
     .pipe($.if(argv.pretty, $.sourcemaps.write('./')))
     .pipe(gulp.dest(config.sass_dest))
 };
@@ -88,7 +89,7 @@ const reload = (done) => {
   done();
 };
 
-const serve = gulp.series(clean, styles, scripts, (done) => {
+const serve = gulp.series(clean, styles, scripts, views, (done) => {
   const startTime = Date.now();
   console.log('\x1b[42m************************************\x1b[0m\n');
   console.log('\x1b[32m  Project ready for coding 😎\x1b[0m\n');
@@ -96,20 +97,19 @@ const serve = gulp.series(clean, styles, scripts, (done) => {
   console.log('[\x1b[32m\x1b[0m]', `All finished in \x1b[35m${Date.now() - startTime} ms`, '\x1b[0m\n');
   server.init({
     notify: config.notify,
-    watch: true,
     server: {
-      baseDir: "./app",
-      directory: false
+      baseDir: "./dist",
     },
     port: config.port,
 
   });
   /*gulp.watch(['./app/!**!/!*.pug'], gulp.series(views), reload);*/
   gulp.watch(['./app/templates/**/*.pug'], gulp.series(views), reload);
-  gulp.watch(['./app/**/*.html']).on('change', browserSync.reload);
+  gulp.watch(['./app/**/*.html']).on('change', reload);
   gulp.watch(['./app/css/!**!/!*.scss'], gulp.series(styles), reload);
   gulp.watch(['./app/js/!*.js'], gulp.series(scripts), reload);
   gulp.watch(['./app/img/!**!/!*'], reload);
+
   done();
 });
 
@@ -118,10 +118,10 @@ gulp.task('production', gulp.series(clean, styles, scripts, views), () => {
   gulp.series('copy')
 });
 
-const watch = () => gulp.watch(config.js_src, gulp.series(scripts, styles, views, reload));
-const dev = gulp.series(clean, serve, watch, () => {
+const dev = gulp.series(clean, serve, () => {
   const startTime = Date.now();
   console.log('[\x1b[32m\x1b[0m]', `All finished in \x1b[35m${Date.now() - startTime} ms`, '\x1b[0m\n');
 });
+
 export default dev;
 
