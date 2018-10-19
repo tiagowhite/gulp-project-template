@@ -37,14 +37,10 @@ const styles = () => {
     .pipe($.plumber())
     .pipe($.if(argv.pretty, $.sourcemaps.init()))
     .pipe($.sass({
-      precision: 10,
-      includePaths: ['app/css/**/*', 'node_modules/flexboxgrid'],
+      includePaths: ['node_modules']
     }).on('error', $.sass.logError))
     .pipe($.autoprefixer(config.autoprefixer_options))
-    .pipe(cleanCSS({debug: true}, (details) => {
-      console.log(`${details.name}: ${details.stats.originalSize}`);
-      console.log(`${details.name}: ${details.stats.minifiedSize}`);
-    }))
+    .pipe(cleanCSS())
     .pipe($.size({title: 'Styles'}))
     .pipe($.header(banner, {pkg}))
     .pipe($.concat(config.css_file_name))
