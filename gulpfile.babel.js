@@ -74,6 +74,18 @@ const views = () => {
     .pipe(gulp.dest(config.templates_dest))
 };
 
+
+const fonts = () => {
+  return gulp.src(config.fonts_src)
+    .pipe(gulp.dest(config.fonts_dest));
+};
+
+const images = () => {
+  return gulp.src(config.img_src)
+    .pipe($.imagemin())
+    .pipe(gulp.dest(config.img_dest))
+};
+
 /*Copy the content from src/ to dist*/
 gulp.task('copy', gulp.parallel(clean), () => gulp.parallel(clean)
   .pipe($.plumber())
@@ -85,7 +97,7 @@ const reload = (done) => {
   done();
 };
 
-const serve = gulp.series(clean, styles, scripts, views, (done) => {
+const serve = gulp.series(clean, styles, scripts, views, fonts, images, (done) => {
   const startTime = Date.now();
   console.log('\x1b[42m************************************\x1b[0m\n');
   console.log('\x1b[32m  Project ready for coding 😎\x1b[0m\n');
@@ -110,7 +122,7 @@ const serve = gulp.series(clean, styles, scripts, views, (done) => {
 });
 
 
-gulp.task('production', gulp.series(clean, styles, scripts, views), () => {
+gulp.task('production', gulp.series(clean, styles, scripts, views, fonts, images), () => {
   gulp.series('copy')
 });
 

@@ -7,6 +7,8 @@
   "del_folder": "./dist",
   "templates_src": "./app/**/*.pug",
   "templates_dest": "./dist/",
+  "fonts_src": "./app/fonts/*",
+  "fonts_dest": "./dist/fonts",
   "sass_src": "./app/css/**/*.scss",
   "sass_dest": "./dist/css",
   "css_file_name": "app.min.css",
@@ -16,6 +18,6 @@
   "js_vendor_src": "./app/js/vendor/**/*.js",
   "js_file_name": "app.min.js",
   "js_dest": "./dist/js",
-  "img_src": "./app/img/*",
-  "img_dest": "./app/img/"
+  "img_src": "./app/img/**/*",
+  "img_dest": "./dist/img"
 }
