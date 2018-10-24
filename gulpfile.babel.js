@@ -53,13 +53,15 @@ const scripts = () => {
     gulp.src(config.js_src)
       .pipe($.plumber())
       .pipe($.babel({
-        presets: ['env']
+        presets: ["es2016"]
       }))
       .pipe($.size({title: 'Build scripts'}))
   )
     .pipe($.if(argv.pretty, $.sourcemaps.init()))
     .pipe($.concat(config.js_file_name))
-    .pipe($.if(!argv.pretty, $.uglify({})))
+    .pipe($.if(!argv.pretty, $.uglify({
+
+    })))
     .pipe($.header(banner, {pkg}))
     .pipe($.if(argv.pretty, $.sourcemaps.write('./')))
     .pipe($.size({title: 'Scripts'}))
@@ -115,7 +117,7 @@ const serve = gulp.series(clean, styles, scripts, views, fonts, images, (done) =
   gulp.watch(['./app/templates/**/*.pug'], gulp.series(views), reload);
   gulp.watch(['./app/**/*.html']).on('change', reload);
   gulp.watch(['./app/css/!**!/!*.scss'], gulp.series(styles), reload);
-  gulp.watch(['./app/js/!*.js'], gulp.series(scripts), reload);
+  gulp.watch(['./app/js/*.js'], gulp.series(scripts), reload);
   gulp.watch(['./app/img/!**!/!*'], reload);
 
   done();

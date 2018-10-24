@@ -12,7 +12,7 @@
   "sass_src": "./app/css/**/*.scss",
   "sass_dest": "./dist/css",
   "css_file_name": "app.min.css",
-  "autoprefixer_options": {"browsers": ["last 3 versions", "ie >= 9", "and_chr >= 2.3"]},
+  "autoprefixer_options": {"browsers": ["last 3 versions", "ie >= 10", "and_chr >= 2.3"]},
   "js_src": ["./app/js/*.js", "./app/js/vendor/**/*.js", "./app/js/build/**/*.js"],
   "js_build_src": "./app/js/build/**/*.js",
   "js_vendor_src": "./app/js/vendor/**/*.js",
