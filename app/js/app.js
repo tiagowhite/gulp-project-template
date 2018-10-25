@@ -1,8 +1,24 @@
 "use strict";
 import 'core-js';
 import * as THREE from 'three';
+import EffectComposer, {
+  Pass,
+  RenderPass,
+  ShaderPass,
+  TexturePass,
+  ClearPass,
+  MaskPass,
+  ClearMaskPass,
+  CopyShader,
+  DotScreenShader,
+  RGBShiftShader
+
+} from 'three-effectcomposer-es6'
+
+
 import baffle from 'baffle';
-import texture_file from '../img/logo0b.png';
+
+const texture_file = '../img/logo0b.png';
 
 const app = () => {
   logoEffect();
@@ -31,8 +47,25 @@ const logoEffect = () => {
   material = new THREE.MeshBasicMaterial({map: texture, transparent: true});
   plane = new THREE.Mesh(geometry, material);
 
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+
+  /*const dotScreenEffect = new ShaderPass(DotScreenShader);
+  dotScreenEffect.uniforms['scale'].value = 4;
+  composer.addPass(dotScreenEffect);
+
+  const rgbEffect = new ShaderPass(RGBShiftShader);
+  rgbEffect.uniforms['amount'].value = 0.0015;
+  rgbEffect.renderToScreen = true;*/
+  composer.addPass(rgbEffect);
+
   scene.add(plane);
   camera.position.z = 2;
+
+  const animate = () => {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  };
 
   (() => {
     requestAnimationFrame(animate);

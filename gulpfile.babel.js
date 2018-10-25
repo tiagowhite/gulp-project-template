@@ -7,8 +7,11 @@
 
 import gulp from 'gulp';
 import del from 'del';
-import merge from 'merge2';
 import browserSync from 'browser-sync';
+import browserify from 'browserify';
+import babelify from 'babelify';
+import source from 'vinyl-source-stream';
+import buffer from 'vinyl-buffer';
 import cleanCSS from 'gulp-clean-css';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import {argv} from 'yargs';
@@ -49,7 +52,26 @@ const styles = () => {
 };
 
 const scripts = () => {
-  return merge(
+
+  let b = browserify({
+    entries: './app/js/app.js',
+    debug: true,
+    paths: ['./app/img']
+  }).transform(babelify, { presets: ["es2015"] });
+
+  return b.bundle()
+    .pipe(source('./app/js/app.js'))
+    .pipe(buffer())
+
+    .pipe($.size({title: 'Bundle scripts'}))
+    .pipe($.if(argv.pretty, $.sourcemaps.init()))
+    .pipe($.concat(config.js_file_name))
+    .pipe($.if(!argv.pretty, $.uglify({})))
+    .pipe($.header(banner, {pkg}))
+    .pipe($.if(argv.pretty, $.sourcemaps.write('./')))
+    .pipe($.size({title: 'Scripts'}))
+    .pipe(gulp.dest(config.js_dest))
+  /*return merge(
     gulp.src(config.js_src)
       .pipe($.plumber())
       .pipe($.babel({
@@ -65,7 +87,7 @@ const scripts = () => {
     .pipe($.header(banner, {pkg}))
     .pipe($.if(argv.pretty, $.sourcemaps.write('./')))
     .pipe($.size({title: 'Scripts'}))
-    .pipe(gulp.dest(config.js_dest))
+    .pipe(gulp.dest(config.js_dest))*/
 };
 
 const views = () => {
