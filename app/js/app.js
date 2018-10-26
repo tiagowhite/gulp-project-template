@@ -1,24 +1,15 @@
 "use strict";
-import 'core-js';
+import baffle from 'baffle';
 import * as THREE from 'three';
 import EffectComposer, {
-  Pass,
   RenderPass,
   ShaderPass,
-  TexturePass,
-  ClearPass,
   MaskPass,
   ClearMaskPass,
-  CopyShader,
-  DotScreenShader,
-  RGBShiftShader
-
+  CopyShader
 } from 'three-effectcomposer-es6'
 
-
-import baffle from 'baffle';
-
-const texture_file = '../img/logo0b.png';
+const texture_file = '../img/venus.jpg';
 
 const app = () => {
   logoEffect();
@@ -47,17 +38,24 @@ const logoEffect = () => {
   material = new THREE.MeshBasicMaterial({map: texture, transparent: true});
   plane = new THREE.Mesh(geometry, material);
 
+  // postprocessing
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
 
-  /*const dotScreenEffect = new ShaderPass(DotScreenShader);
+  const dotScreenEffect = new ShaderPass(DotScreenShader);
   dotScreenEffect.uniforms['scale'].value = 4;
   composer.addPass(dotScreenEffect);
+  dotScreenEffect.renderToScreen = true;
 
   const rgbEffect = new ShaderPass(RGBShiftShader);
-  rgbEffect.uniforms['amount'].value = 0.0015;
-  rgbEffect.renderToScreen = true;*/
+  rgbEffect.uniforms['amount'].value = 1;
   composer.addPass(rgbEffect);
+  rgbEffect.renderToScreen = true;
+
+  const glitchPass = new GlitchPass(DigitalGlitch);
+  composer.addPass(glitchPass);
+
+
 
   scene.add(plane);
   camera.position.z = 2;
@@ -76,49 +74,3 @@ const logoEffect = () => {
 
 app();
 
-/*function runThree() {
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-
-  const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('canvas'), antialias: true});
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0x200c23);
-
-  const geometry = new THREE.PlaneGeometry(1, 1, 1);
-  const texture = new THREE.TextureLoader().load(texture_file);
-  const material = new THREE.MeshBasicMaterial({map: texture, transparent: true});
-  const plane = new THREE.Mesh(geometry, material);
-
-  /!*!/
-  postprocessing
-   *!/
-  const composer = new EffectComposer(renderer);
-  composer.addPass(new RenderPass(scene, camera));
-
-  const dotScreenEffect = new ShaderPass(DotScreenShader);
-  dotScreenEffect.uniforms['scale'].value = 4;
-  composer.addPass(dotScreenEffect);
-
-  const rgbEffect = new ShaderPass(RGBShiftShader);
-  rgbEffect.uniforms['amount'].value = 0.0015;
-  rgbEffect.renderToScreen = true;
-  composer.addPass(rgbEffect);
-
-  scene.add(plane);
-
-  camera.position.z = 2;
-
-  const animate = function () {
-    requestAnimationFrame(animate);
-
-    /!*cube.rotation.x += 0.1;
-    cube.rotation.y += 0.1;*!/
-
-    renderer.render(scene, camera);
-  };
-
-  animate();
-}
-
-app();*/
