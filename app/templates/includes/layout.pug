@@ -8,7 +8,7 @@ html(lang="en")
         .transition
         header
           div.name
-           h1 TIAGO DE ARAUJO FERNANDES
+            h1 TIAGO DE ARAUJO FERNANDES
           div.logo
             img(src="../img/logo0a.png" alt="Tiago de A. Fernandes" draggable="false")
           nav
@@ -19,55 +19,114 @@ html(lang="en")
                 a(href="#") LAB
               li
                 a(href="#") ABOUT
-      canvas#canvas
+
     include footer
+  script(src='/js/app.min.js')
   script(src='/js/vendor/three.js')
   script(src='/js/vendor/EffectComposer.js')
-  script(src='/js/vendor/shaders/ShaderPass.js')
   script(src='/js/vendor/shaders/RenderPass.js')
+  script(src='/js/vendor/shaders/ShaderPass.js')
+  script(src='/js/vendor/shaders/MaskPass.js')
+
   script(src='/js/vendor/shaders/CopyShader.js')
-  script(src='/js/vendor/shaders/SepiaShader.js')
-  script(src='/js/vendor/shaders/DigitalGlitch.js')
-  script(src='/js/vendor/shaders/GlitchPass.js')
+  script(src='/js/vendor/shaders/FilmShader.js')
+
+  script(src='/js/vendor/shaders/RGBShiftShader.js')
+  script(src='/js/vendor/shaders/BadTVShader.js')
+  script(src='/js/vendor/shaders/StaticShader.js')
 
   script.
-    var scene, camera, renderer, geometry, texture, material, plane, texture_file
-    texture_file = '../img/venus.jpg';
+    var camera, scene, renderer;
+    var composer;
+    var shaderTime = 0;
+    var badTVPass;
+    var staticPass;
+    var rgbPass;
+    var filmPass;
+    var video
+    var renderPass, copyPass;
+    var texture_file = '../img/venus.jpg';
 
-    renderer = new THREE.WebGLRenderer({canvas: document.getElementById('canvas'), antialias: true});
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x200c23);
+    _init();
+    _animate();
 
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+    function _init() {
+      camera = new THREE.PerspectiveCamera(55, 1080 / 720, 20, 3000);
+      camera.position.z = 1000;
+      scene = new THREE.Scene();
 
-    geometry = new THREE.PlaneBufferGeometry(2, 2, 2);
-    texture = new THREE.TextureLoader().load(texture_file);
-    material = new THREE.MeshBasicMaterial({map: texture, transparent: true});
-    plane = new THREE.Mesh(geometry, material);
-
-    // postprocessing
-    var composer = new THREE.EffectComposer(renderer);
-
-    var renderPass = new THREE.RenderPass(scene, camera);
-    composer.addPass(renderPass);
-
-    var glitchPass = new THREE.GlitchPass(0);
-    composer.addPass(glitchPass);
-
-    scene.add(plane);
-    camera.position.z = 2;
-
-    var animate = function () {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-    };
-
-    (function () {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-    })()
+      camera = new THREE.PerspectiveCamera(55, 1080 / 720, 20, 3000);
+      camera.position.z = 1000;
+      scene = new THREE.Scene();
+      //Load Video
+      video = document.createElement('video');
+      video.loop = true;
+      video.src = '../img/fits.mp4';
+      video.play();
 
 
-  script(src='/js/app.min.js')
+
+      //Add video plane
+      var videoTexture = new THREE.Texture(video);
+      videoTexture.minFilter = THREE.LinearFilter;
+      videoTexture.magFilter = THREE.LinearFilter;
+      var videoMaterial = new THREE.MeshBasicMaterial({
+        map: videoTexture
+      });
+      //Add video plane
+      var planeGeometry = new THREE.PlaneGeometry(1080, 720, 1, 1);
+      var plane = new THREE.Mesh(planeGeometry, videoMaterial);
+      scene.add(plane);
+      plane.z = 0;
+      plane.scale.x = plane.scale.y = 1.45;
+      renderer = new THREE.WebGLRenderer();
+      renderer.setSize(800, 600);
+      document.body.appendChild(renderer.domElement);
+
+
+      //Create Shader Passes
+      renderPass = new THREE.RenderPass(scene, camera);
+      badTVPass = new THREE.ShaderPass(THREE.BadTVShader);
+      rgbPass = new THREE.ShaderPass(THREE.RGBShiftShader);
+      filmPass = new THREE.ShaderPass(THREE.FilmShader);
+      staticPass = new THREE.ShaderPass(THREE.StaticShader);
+      copyPass = new THREE.ShaderPass(THREE.CopyShader);
+      //set shader uniforms
+
+      filmPass.uniforms.grayscale.value = 0;
+
+
+
+      badTVPass.uniforms['distortion'].value = 0.1
+      badTVPass.uniforms['distortion2'].value = 0.1
+      badTVPass.uniforms['speed'].value = 0
+      badTVPass.uniforms['rollSpeed'].value = 0
+      staticPass.uniforms['amount'].value = 0
+      staticPass.uniforms['size'].value = 0
+      rgbPass.uniforms['angle'].value = Math.PI;
+      rgbPass.uniforms['amount'].value = 0
+      filmPass.uniforms['sCount'].value = 0.1
+      filmPass.uniforms['sIntensity'].value = 0.1
+      filmPass.uniforms['nIntensity'].value = 0.2
+
+
+      composer = new THREE.EffectComposer(renderer);
+      composer.addPass(renderPass);
+
+
+    }
+
+
+    function _animate() {
+      shaderTime += 0.1;
+      badTVPass.uniforms['time'].value = shaderTime;
+      filmPass.uniforms['time'].value = shaderTime;
+      staticPass.uniforms['time'].value = shaderTime;
+      // if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      //   if (videoTexture) videoTexture.needsUpdate = true;
+      // }
+      requestAnimationFrame(_animate);
+      composer.render(0.1)
+      //renderer.render(scene, camera)
+
+    }
