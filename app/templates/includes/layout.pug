@@ -21,4 +21,53 @@ html(lang="en")
                 a(href="#") ABOUT
       canvas#canvas
     include footer
+  script(src='/js/vendor/three.js')
+  script(src='/js/vendor/EffectComposer.js')
+  script(src='/js/vendor/shaders/ShaderPass.js')
+  script(src='/js/vendor/shaders/RenderPass.js')
+  script(src='/js/vendor/shaders/CopyShader.js')
+  script(src='/js/vendor/shaders/SepiaShader.js')
+  script(src='/js/vendor/shaders/DigitalGlitch.js')
+  script(src='/js/vendor/shaders/GlitchPass.js')
+
+  script.
+    var scene, camera, renderer, geometry, texture, material, plane, texture_file
+    texture_file = '../img/venus.jpg';
+
+    renderer = new THREE.WebGLRenderer({canvas: document.getElementById('canvas'), antialias: true});
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x200c23);
+
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+
+    geometry = new THREE.PlaneBufferGeometry(2, 2, 2);
+    texture = new THREE.TextureLoader().load(texture_file);
+    material = new THREE.MeshBasicMaterial({map: texture, transparent: true});
+    plane = new THREE.Mesh(geometry, material);
+
+    // postprocessing
+    var composer = new THREE.EffectComposer(renderer);
+
+    var renderPass = new THREE.RenderPass(scene, camera);
+    composer.addPass(renderPass);
+
+    var glitchPass = new THREE.GlitchPass(0);
+    composer.addPass(glitchPass);
+
+    scene.add(plane);
+    camera.position.z = 2;
+
+    var animate = function () {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    };
+
+    (function () {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    })()
+
+
   script(src='/js/app.min.js')

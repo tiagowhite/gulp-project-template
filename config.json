@@ -17,6 +17,7 @@
   "js_build_src": "./app/js/build/**/*.js",
   "js_vendor_src": "./app/js/vendor/**/*.js",
   "js_file_name": "app.min.js",
+  "js_file_name_vendor": "vendor.min.js",
   "js_dest": "./dist/js",
   "img_src": "./app/img/**/*",
   "img_dest": "./dist/img"

@@ -57,7 +57,7 @@ const scripts = () => {
     entries: './app/js/app.js',
     debug: true,
     paths: ['./app/img']
-  }).transform(babelify, { presets: ["es2015"] });
+  }).transform(babelify, {presets: ["es2015"]});
 
   return b.bundle()
     .pipe(source('./app/js/app.js'))
@@ -68,27 +68,16 @@ const scripts = () => {
     .pipe($.concat(config.js_file_name))
     .pipe($.if(!argv.pretty, $.uglify({})))
     .pipe($.header(banner, {pkg}))
-    .pipe($.if(argv.pretty, $.sourcemaps.write('./')))
     .pipe($.size({title: 'Scripts'}))
     .pipe(gulp.dest(config.js_dest))
-  /*return merge(
-    gulp.src(config.js_src)
-      .pipe($.plumber())
-      .pipe($.babel({
-        presets: ["es2016"]
-      }))
-      .pipe($.size({title: 'Build scripts'}))
-  )
-    .pipe($.if(argv.pretty, $.sourcemaps.init()))
-    .pipe($.concat(config.js_file_name))
-    .pipe($.if(!argv.pretty, $.uglify({
-
-    })))
-    .pipe($.header(banner, {pkg}))
-    .pipe($.if(argv.pretty, $.sourcemaps.write('./')))
-    .pipe($.size({title: 'Scripts'}))
-    .pipe(gulp.dest(config.js_dest))*/
 };
+
+const vendor = () => {
+  return gulp.src("./app/js/vendor/**/*")
+    .pipe(gulp.dest("./dist/js/vendor"));
+};
+
+
 
 const views = () => {
   return gulp.src(config.templates_src)
@@ -121,7 +110,7 @@ const reload = (done) => {
   done();
 };
 
-const serve = gulp.series(clean, styles, scripts, views, fonts, images, (done) => {
+const serve = gulp.series(clean, styles, scripts, vendor, views, fonts, images, (done) => {
   const startTime = Date.now();
   console.log('\x1b[42m************************************\x1b[0m\n');
   console.log('\x1b[32m  Project ready for coding 😎\x1b[0m\n');
@@ -146,7 +135,7 @@ const serve = gulp.series(clean, styles, scripts, views, fonts, images, (done) =
 });
 
 
-gulp.task('production', gulp.series(clean, styles, scripts, views, fonts, images), () => {
+gulp.task('production', gulp.series(clean, styles, scripts, vendor, views, fonts, images), () => {
   gulp.series('copy')
 });
 
