@@ -74,6 +74,7 @@ const scripts = () => {
 
 const vendor = () => {
   return gulp.src("./app/js/vendor/**/*")
+    .pipe($.if(!argv.pretty, $.uglify({})))
     .pipe(gulp.dest("./dist/js/vendor"));
 };
 
@@ -127,7 +128,7 @@ const serve = gulp.series(clean, styles, scripts, vendor, views, fonts, images, 
   /*gulp.watch(['./app/!**!/!*.pug'], gulp.series(views), reload);*/
   gulp.watch(['./app/templates/**/*.pug'], gulp.series(views), reload);
   gulp.watch(['./app/**/*.html']).on('change', reload);
-  gulp.watch(['./app/css/!**!/!*.scss'], gulp.series(styles), reload);
+  gulp.watch(['./app/css/**/*.scss'], gulp.series(styles), reload);
   gulp.watch(['./app/js/*.js'], gulp.series(scripts), reload);
   gulp.watch(['./app/img/!**!/!*'], reload);
 

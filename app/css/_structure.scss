@@ -82,9 +82,13 @@ footer {
   width: auto;
   height: 50px;
   margin: 0 auto;
-
-  p {
-    text-align: center
-  }
-
+  p { text-align: center  }
+  ul,li { text-decoration: none; list-style-type: none; display: inline-block;}
+  ul > li { margin-right: 1em;}
+  ul > li:last-child { margin-right: 0;}
+  ul > li > a > svg { width: 16px;height: 16px; }
+  ul > li > a > svg > path { fill: $yellow-base; transition: fill .3s ease; }
+}
+div.about {
+  ;
 }
