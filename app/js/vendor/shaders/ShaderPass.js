@@ -2,69 +2,65 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ShaderPass = function( shader, textureID ) {
+THREE.ShaderPass = function ( shader, textureID ) {
 
-  this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
+	THREE.Pass.call( this );
 
-  if ( shader instanceof THREE.ShaderMaterial ) {
+	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
 
-    this.uniforms = shader.uniforms;
+	if ( shader instanceof THREE.ShaderMaterial ) {
 
-    this.material = shader;
+		this.uniforms = shader.uniforms;
 
-  }
-  else if ( shader ) {
+		this.material = shader;
 
-    this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+	} else if ( shader ) {
 
-    this.material = new THREE.ShaderMaterial( {
+		this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-      defines: shader.defines || {},
-      uniforms: this.uniforms,
-      vertexShader: shader.vertexShader,
-      fragmentShader: shader.fragmentShader
+		this.material = new THREE.ShaderMaterial( {
 
-    } );
+			defines: shader.defines || {},
+			uniforms: this.uniforms,
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader
 
-  }
+		} );
 
-  this.renderToScreen = false;
+	}
 
-  this.enabled = true;
-  this.needsSwap = true;
-  this.clear = false;
+	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.scene = new THREE.Scene();
 
-
-  this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-  this.scene = new THREE.Scene();
-
-  this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-  this.scene.add( this.quad );
+	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.scene.add( this.quad );
 
 };
 
-THREE.ShaderPass.prototype = {
+THREE.ShaderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-  render: function( renderer, writeBuffer, readBuffer, delta ) {
+	constructor: THREE.ShaderPass,
 
-    if ( this.uniforms[ this.textureID ] ) {
+	render: function( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-      this.uniforms[ this.textureID ].value = readBuffer;
+		if ( this.uniforms[ this.textureID ] ) {
 
-    }
+			this.uniforms[ this.textureID ].value = readBuffer.texture;
 
-    this.quad.material = this.material;
+		}
 
-    if ( this.renderToScreen ) {
+		this.quad.material = this.material;
 
-      renderer.render( this.scene, this.camera );
+		if ( this.renderToScreen ) {
 
-    } else {
+			renderer.render( this.scene, this.camera );
 
-      renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+		} else {
 
-    }
+			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
 
-  }
+		}
 
-};
+	}
+
+} );

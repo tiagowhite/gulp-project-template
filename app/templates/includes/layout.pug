@@ -17,8 +17,107 @@ html(lang="en")
                 a(href="#") WORK
               li
                 a(href="#") ABOUT
-              li
-                a(href="#") LAB
-      include header
-  include footer
+      canvas#canvas
+    include footer
+  script(src='/js/vendor/three.js')
+  script(src='/js/vendor/EffectComposer.js')
+  script(src='/js/vendor/shaders/ShaderPass.js')
+  script(src='/js/vendor/shaders/RenderPass.js')
+  script(src='/js/vendor/shaders/CopyShader.js')
+  script(src='/js/vendor/shaders/SepiaShader.js')
+  script(src='/js/vendor/shaders/DigitalGlitch.js')
+  script(src='/js/vendor/shaders/GlitchPass.js')
+  script.
+    var scene, camera, renderer, geometry, texture, material, plane, texture_file
+    texture_file = '../img/logo0a.png';
+
+    renderer = new THREE.WebGLRenderer({canvas: document.getElementById('canvas'), antialias: true});
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x200c23);
+
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+
+    geometry = new THREE.PlaneBufferGeometry(2, 2, 2);
+    texture = new THREE.TextureLoader().load(texture_file);
+    //var material = new THREE.MeshLambertMaterial();
+    material = new THREE.MeshBasicMaterial({map: texture, transparent: true});
+    plane = new THREE.Mesh(geometry, material);
+    scene.add(plane);
+    //LIGHTS
+    var light = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(light);
+
+    //camera.position.z = 2;
+
+    // postprocessing
+    var composer = new THREE.EffectComposer(renderer);
+    var renderPass = new THREE.RenderPass(scene, camera);
+    composer.addPass(renderPass);
+
+    var glitchPass = new THREE.GlitchPass(0);
+    composer.addPass(glitchPass);
+
+    //custom shader pass
+    var myEffect = {
+      uniforms: {
+        "tDiffuse": {value: null},
+        "amount": {value: 1.0}
+      },
+      vertexShader: [
+        "varying vec2 vUv;",
+        "void main() {",
+        "vUv = uv;",
+        "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+        "}"
+      ].join("\n"),
+      fragmentShader: [
+        "uniform float amount;",
+        "uniform sampler2D tDiffuse;",
+        "varying vec2 vUv;",
+        "void main() {",
+        "vec4 color = texture2D( tDiffuse, vUv );",
+        "vec3 c = color.rgb;",
+        "color.r = c.r * 2.0;",
+        "color.g = c.g / 1.2;",
+        "color.b = c.b;",
+        "gl_FragColor = vec4( color.rgb , color.a );",
+        "}"
+      ].join("\n")
+    }
+
+    var customPass = new THREE.ShaderPass(myEffect);
+    customPass.renderToScreen = true;
+    composer.addPass(customPass);
+
+
+
+    var animate = function () {
+      composer.render();
+      requestAnimationFrame(animate);
+    };
+    animate();
+
+
+  script(id="vertShader" type="x-shader/x-fragment").
+    varying vec2 vUv;
+
+    void main()
+    {
+      vUv = uv;
+      gl_Position = projectionMatrix *
+      modelViewMatrix *
+      vec4(position,1.0);
+    }
+  script(id="fragShader" type="x-shader/x-fragment").
+    uniform sampler2D texture1;
+    varying vec2 vUv;
+
+    void main(void)
+    {
+      vec4 texture = texture2D(texture1, vUv);
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0-texture.r);
+    }
+
   script(src='/js/app.min.js')
