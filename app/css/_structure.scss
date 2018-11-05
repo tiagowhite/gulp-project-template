@@ -8,9 +8,16 @@ body {
   font-family: $font-family-monospace;
   font-weight: 300;
   font-size: 15px;
-  display: flex;
-  flex-direction: column;
 }
+body#tiagofernandes {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  .container {
+    flex: 1;
+  }
+}
+
 
 header {
   margin: 5vh 5vh;
@@ -82,13 +89,52 @@ footer {
   width: auto;
   height: 50px;
   margin: 0 auto;
+  flex-shrink: 0;
   p { text-align: center  }
-  ul,li { text-decoration: none; list-style-type: none; display: inline-block;}
+  ul,li { text-decoration: none; list-style-type: none; display: inline-block; margin: 0; padding: 0;}
   ul > li { margin-right: 1em;}
   ul > li:last-child { margin-right: 0;}
   ul > li > a > svg { width: 16px;height: 16px; }
-  ul > li > a > svg > path { fill: $yellow-base; transition: fill .3s ease; }
+  ul > li > a > svg > path { fill: $yellow-base; }
+    ul > li > a:hover > svg > path { fill: $yellow-text; transition: color .35s ease;}
+
 }
-div.about {
-  ;
+
+
+p.hello {
+  color: $yellow-base;
+  margin-top: 8vh;
+  text-align: justify;
+  strong { color: $yellow-text }
+  small { color: $yellow-text; display: block; margin-top: 10px;}
 }
+
+p.hello {
+  -webkit-animation: fade-in-bottom 0.6s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+  animation: fade-in-bottom 0.6s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+}
+@-webkit-keyframes fade-in-bottom {
+  0% {
+    -webkit-transform: translateY(50px);
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes fade-in-bottom {
+  0% {
+    -webkit-transform: translateY(50px);
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+

@@ -2,8 +2,8 @@
 import baffle from 'baffle';
 
 const textEffect = () => {
-  baffle('.hello', {
-    speed: 75
+  baffle('.name h1', {
+    speed: 55
   }).reveal(1000);
 };
 
