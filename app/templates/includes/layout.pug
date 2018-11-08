@@ -27,29 +27,11 @@ html(lang="en")
   script(src='/js/vendor/shaders/SepiaShader.js')
   script(src='/js/vendor/shaders/DigitalGlitch.js')
   script(src='/js/vendor/shaders/GlitchPass.js')
-  script(id="vertShader" type="x-shader/x-fragment").
-    varying vec2 vUv;
 
-    void main()
-    {
-      vUv = uv;
-      gl_Position = projectionMatrix *
-      modelViewMatrix *
-      vec4(position,1.0);
-    }
-  script(id="fragShader" type="x-shader/x-fragment").
-    uniform sampler2D texture1;
-    varying vec2 vUv;
-
-    void main(void)
-    {
-      vec4 texture = texture2D(texture1, vUv);
-      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0-texture.a);
-    }
 
   script(type="text/javascript").
     function World() {
-      this.constructor = function() {
+      this.constructor = function () {
         // this.scene = new THREE.Scene();
         // this.renderer = THREE.WebGLRenderer({canvas: document.getElementById('canvas'), antialias: true, alpha: true});
         // this.renderer.setClearColor(0x000000, 0);
@@ -70,40 +52,22 @@ html(lang="en")
       }
 
       this.addObject = function () {
-        var vertShader = document.getElementById('vertShader').innerHTML;
-        var fragShader = document.getElementById('fragShader').innerHTML;
-        var attributes = {};
-        var uniforms = {
-          texture1: {type: "t", value: this.texture}
-        };
-        var material = new THREE.ShaderMaterial({
-          uniforms: uniforms,
-          vertexShader: vertShader,
-          fragmentShader: fragShader,
-          transparent: true
-        });
+        //var vertShader = document.getElementById('vertShader').innerHTML;
+        //var fragShader = document.getElementById('fragShader').innerHTML;
+
+        var material = new THREE.ShaderMaterial({transparent: true, map: this.texture});
         var geometry1 = new THREE.PlaneBufferGeometry(400, 300, 50);
         this.cube = new THREE.Mesh(geometry1, material);
         this.scene.add(this.cube);
 
-        var material2 = new THREE.ShaderMaterial({
-          uniforms: uniforms,
-          vertexShader: vertShader,
-          fragmentShader: fragShader,
-          transparent: true
-        });
-
-        var geometry2 = new THREE.PlaneBufferGeometry(400,300,50);
-        this.plane = new THREE.Mesh(geometry2,material2)
-        this.scene.add(this.plane);
       }
 
-      this.postProcessing = function() {
+      this.postProcessing = function () {
 
         var renderPass = new THREE.RenderPass(this.scene, this.camera)
         this.composer.addPass(renderPass);
 
-        var glitchPass = new THREE.GlitchPass(0);
+        var glitchPass = new THREE.GlitchPass(64);
         this.composer.addPass(glitchPass);
 
         //custom shader pass
@@ -134,9 +98,50 @@ html(lang="en")
           ].join("\n")
         }
 
+        var maskPass = {
+          uniforms: {
+            "tDiffuse": { value: null},
+            "tMask": { value: null}
+          },
+          vertexShader: [
+            "varying vec2 vUv;",
+            "void main() {",
+            "vUv = uv;",
+            "gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
+            "}"
+          ].
+          join("\n"),
+          fragmentShader: [
+            "uniform sampler2D tDiffuse;",
+            "uniform sampler2D tMask;",
+            "varying vec2 vUv;",
+            "void main() {",
+            // get the current pixel color
+            "vec4 texel = texture2D(tDiffuse, vUv);",
+            // get alpha based on the color of the mask image
+            "float alpha = texture2D(tMask, vUv).r;",
+            // apply the alpha to the current pixel
+            "gl_FragColor = texel * alpha;",
+            "}"
+          ].join("\n")
+        };
+
+
+
         var customPass = new THREE.ShaderPass(myEffect);
         customPass.renderToScreen = true;
         this.composer.addPass(customPass);
+        //
+       // this.texture = new THREE.TextureLoader().load("../img/logo0a.png");
+        var loader = new THREE.TextureLoader();
+        loader.load('../img/logo0a.png', function (t) {
+          t.minFilter = THREE.LinearFilter;
+          t.magFilter = THREE.LinearFilter;
+          maskPass.uniforms.tMask.value = t;
+        });
+
+        var mask = new THREE.ShaderPass(maskPass)
+        mask.renderToScreen = true;
 
       }
 
