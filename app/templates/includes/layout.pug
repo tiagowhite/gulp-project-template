@@ -17,7 +17,7 @@ html(lang="en")
                 a(href="#") WORK
               li
                 a(href="#") ABOUT
-      canvas#canvas
+      #canvas
     include footer
   script(src='/js/vendor/three.js')
   script(src='/js/vendor/EffectComposer.js')
@@ -27,22 +27,34 @@ html(lang="en")
   script(src='/js/vendor/shaders/SepiaShader.js')
   script(src='/js/vendor/shaders/DigitalGlitch.js')
   script(src='/js/vendor/shaders/GlitchPass.js')
+  script(src='/js/vendor/shaders/MaskPass.js')
 
 
   script(type="text/javascript").
     function World() {
       this.constructor = function () {
-        // this.scene = new THREE.Scene();
-        // this.renderer = THREE.WebGLRenderer({canvas: document.getElementById('canvas'), antialias: true, alpha: true});
-        // this.renderer.setClearColor(0x000000, 0);
-        // this.resize();
         this.scene = new THREE.Scene();
         this.renderer = new THREE.WebGLRenderer({alpha: true});
         this.texture = new THREE.TextureLoader().load("../img/logo0a.png");
         this.renderer.setClearColor(0x000000, 0);
-        this.composer = new THREE.EffectComposer(this.renderer);
 
-        document.body.appendChild(this.renderer.domElement);
+        var mainContainer = document.querySelector('#canvas');
+
+        var viewWidth = mainContainer.clientWidth;
+        var viewHeight = mainContainer.clientHeight;
+
+        var compWidth = viewWidth * window.devicePixelRatio;
+        var compHeight = viewHeight * window.devicePixelRatio;
+
+        this.composer = new THREE.EffectComposer(this.renderer, new THREE.WebGLRenderTarget(compWidth, compHeight, {
+          minFilter: THREE.LinearFilter,
+          magFilter: THREE.LinearFilter,
+          format: THREE.RGBAFormat,
+          stencilBuffer: false
+        }));
+
+        document.querySelector('#canvas').appendChild(this.renderer.domElement);
+
         this.resize();
         this.addObject();
         this.postProcessing();
@@ -52,51 +64,16 @@ html(lang="en")
       }
 
       this.addObject = function () {
-        //var vertShader = document.getElementById('vertShader').innerHTML;
-        //var fragShader = document.getElementById('fragShader').innerHTML;
-
-        var material = new THREE.ShaderMaterial({transparent: true, map: this.texture});
+        var material = new THREE.ShaderMaterial({map: this.texture});
         var geometry1 = new THREE.PlaneBufferGeometry(400, 300, 50);
-        this.cube = new THREE.Mesh(geometry1, material);
-        this.scene.add(this.cube);
-
+        this.plane = new THREE.Mesh(geometry1, material);
+        this.scene.add(this.plane);
       }
 
       this.postProcessing = function () {
 
         var renderPass = new THREE.RenderPass(this.scene, this.camera)
-        this.composer.addPass(renderPass);
-
-        var glitchPass = new THREE.GlitchPass(64);
-        this.composer.addPass(glitchPass);
-
-        //custom shader pass
-        var myEffect = {
-          uniforms: {
-            "tDiffuse": {value: null},
-            "amount": {value: 1.0}
-          },
-          vertexShader: [
-            "varying vec2 vUv;",
-            "void main() {",
-            "vUv = uv;",
-            "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-            "}"
-          ].join("\n"),
-          fragmentShader: [
-            "uniform float amount;",
-            "uniform sampler2D tDiffuse;",
-            "varying vec2 vUv;",
-            "void main() {",
-            "vec4 color = texture2D( tDiffuse, vUv );",
-            "vec3 c = color.rgb;",
-            "color.r = c.r * 2.0;",
-            "color.g = c.g / 1.2;",
-            "color.b = c.b;",
-            "gl_FragColor = vec4( color.rgb , color.a );",
-            "}"
-          ].join("\n")
-        }
+        var glitchPass = new THREE.GlitchPass(0);
 
         var maskPass = {
           uniforms: {
@@ -118,21 +95,16 @@ html(lang="en")
             "void main() {",
             // get the current pixel color
             "vec4 texel = texture2D(tDiffuse, vUv);",
+
             // get alpha based on the color of the mask image
-            "float alpha = texture2D(tMask, vUv).r;",
+            "float alpha = texture2D(tMask, vUv).a;",
+
             // apply the alpha to the current pixel
             "gl_FragColor = texel * alpha;",
             "}"
           ].join("\n")
         };
 
-
-
-        var customPass = new THREE.ShaderPass(myEffect);
-        customPass.renderToScreen = true;
-        this.composer.addPass(customPass);
-        //
-       // this.texture = new THREE.TextureLoader().load("../img/logo0a.png");
         var loader = new THREE.TextureLoader();
         loader.load('../img/logo0a.png', function (t) {
           t.minFilter = THREE.LinearFilter;
@@ -142,6 +114,10 @@ html(lang="en")
 
         var mask = new THREE.ShaderPass(maskPass)
         mask.renderToScreen = true;
+
+        this.composer.addPass(renderPass);
+        this.composer.addPass(glitchPass);
+        this.composer.addPass(maskPass);
 
       }
 
