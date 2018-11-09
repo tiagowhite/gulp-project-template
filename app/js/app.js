@@ -1,4 +1,6 @@
+
 "use strict";
+
 import baffle from 'baffle';
 
 const textEffect = () => {
@@ -8,4 +10,5 @@ const textEffect = () => {
 };
 
 textEffect();
+
 

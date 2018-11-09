@@ -16,127 +16,21 @@ html(lang="en")
               li
                 a(href="#") WORK
               li
+                a(href="#") LAB
+              li
                 a(href="#") ABOUT
       #canvas
     include footer
-  script(src='/js/vendor/three.js')
-  script(src='/js/vendor/EffectComposer.js')
-  script(src='/js/vendor/shaders/ShaderPass.js')
-  script(src='/js/vendor/shaders/RenderPass.js')
-  script(src='/js/vendor/shaders/CopyShader.js')
-  script(src='/js/vendor/shaders/SepiaShader.js')
-  script(src='/js/vendor/shaders/DigitalGlitch.js')
-  script(src='/js/vendor/shaders/GlitchPass.js')
-  script(src='/js/vendor/shaders/MaskPass.js')
-
-
-  script(type="text/javascript").
-    function World() {
-      this.constructor = function () {
-        this.scene = new THREE.Scene();
-        this.renderer = new THREE.WebGLRenderer({alpha: true});
-        this.texture = new THREE.TextureLoader().load("../img/logo0a.png");
-        this.renderer.setClearColor(0x000000, 0);
-
-        var mainContainer = document.querySelector('#canvas');
-
-        var viewWidth = mainContainer.clientWidth;
-        var viewHeight = mainContainer.clientHeight;
-
-        var compWidth = viewWidth * window.devicePixelRatio;
-        var compHeight = viewHeight * window.devicePixelRatio;
-
-        this.composer = new THREE.EffectComposer(this.renderer, new THREE.WebGLRenderTarget(compWidth, compHeight, {
-          minFilter: THREE.LinearFilter,
-          magFilter: THREE.LinearFilter,
-          format: THREE.RGBAFormat,
-          stencilBuffer: false
-        }));
-
-        document.querySelector('#canvas').appendChild(this.renderer.domElement);
-
-        this.resize();
-        this.addObject();
-        this.postProcessing();
-
-        requestAnimationFrame(this.render.bind(this));
-        window.addEventListener('resize', this.resize.bind(this));
-      }
-
-      this.addObject = function () {
-        var material = new THREE.ShaderMaterial({map: this.texture});
-        var geometry1 = new THREE.PlaneBufferGeometry(400, 300, 50);
-        this.plane = new THREE.Mesh(geometry1, material);
-        this.scene.add(this.plane);
-      }
-
-      this.postProcessing = function () {
-
-        var renderPass = new THREE.RenderPass(this.scene, this.camera)
-        var glitchPass = new THREE.GlitchPass(0);
-
-        var maskPass = {
-          uniforms: {
-            "tDiffuse": { value: null},
-            "tMask": { value: null}
-          },
-          vertexShader: [
-            "varying vec2 vUv;",
-            "void main() {",
-            "vUv = uv;",
-            "gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
-            "}"
-          ].
-          join("\n"),
-          fragmentShader: [
-            "uniform sampler2D tDiffuse;",
-            "uniform sampler2D tMask;",
-            "varying vec2 vUv;",
-            "void main() {",
-            // get the current pixel color
-            "vec4 texel = texture2D(tDiffuse, vUv);",
-
-            // get alpha based on the color of the mask image
-            "float alpha = texture2D(tMask, vUv).a;",
-
-            // apply the alpha to the current pixel
-            "gl_FragColor = texel * alpha;",
-            "}"
-          ].join("\n")
-        };
-
-        var loader = new THREE.TextureLoader();
-        loader.load('../img/logo0a.png', function (t) {
-          t.minFilter = THREE.LinearFilter;
-          t.magFilter = THREE.LinearFilter;
-          maskPass.uniforms.tMask.value = t;
-        });
-
-        var mask = new THREE.ShaderPass(maskPass)
-        mask.renderToScreen = true;
-
-        this.composer.addPass(renderPass);
-        this.composer.addPass(glitchPass);
-        this.composer.addPass(maskPass);
-
-      }
-
-      this.render = function () {
-        requestAnimationFrame(this.render.bind(this));
-        this.renderer.render(this.scene, this.camera);
-        this.composer.render();
-
-      }
-      this.resize = function () {
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.camera.position.z = 1000;
-
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-      }
-    }
-    var _w = new World();
-    _w.constructor();
-
-
+  //script(src='/js/vendor/three.js')
+  //script(src='/js/vendor/EffectComposer.js')
+  //script(src='/js/vendor/shaders/ShaderPass.js')
+  //script(src='/js/vendor/shaders/RenderPass.js')
+  //script(src='/js/vendor/shaders/CopyShader.js')
+  //script(src='/js/vendor/shaders/SepiaShader.js')
+  //script(src='/js/vendor/shaders/DigitalGlitch.js')
+  //script(src='/js/vendor/shaders/GlitchPass.js')
+  //script(src='/js/vendor/shaders/MaskPass.js')
+  //script(type="text/javascript").
 
   script(src='/js/app.min.js')
+  script(src='/js/vendor.min.js')

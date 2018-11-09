@@ -56,7 +56,6 @@ const scripts = () => {
   let b = browserify({
     entries: './app/js/app.js',
     debug: true,
-    paths: ['./app/img']
   }).transform(babelify, {presets: ["es2015"]});
 
   return b.bundle()
@@ -70,12 +69,23 @@ const scripts = () => {
     .pipe($.header(banner, {pkg}))
     .pipe($.size({title: 'Scripts'}))
     .pipe(gulp.dest(config.js_dest))
+
 };
 
 const vendor = () => {
-  return gulp.src("./app/js/vendor/**/*")
+  return gulp.src("./app/js/3d.js")
+    .pipe($.include({
+      extensions: "js",
+      hardFail: true,
+      includePaths: [
+        __dirname + "/node_modules/three"
+      ]
+    }))
     .pipe($.if(!argv.pretty, $.uglify({})))
-    .pipe(gulp.dest("./dist/js/vendor"));
+    .pipe($.header(banner, {pkg}))
+    .pipe($.size({title: 'Vendor'}))
+    .pipe($.concat(config.js_file_name_vendor))
+    .pipe(gulp.dest(config.js_dest));
 };
 
 
@@ -129,7 +139,7 @@ const serve = gulp.series(clean, styles, scripts, vendor, views, fonts, images, 
   gulp.watch(['./app/templates/**/*.pug'], gulp.series(views), reload);
   gulp.watch(['./app/**/*.html']).on('change', reload);
   gulp.watch(['./app/css/**/*.scss'], gulp.series(styles), reload);
-  gulp.watch(['./app/js/*.js'], gulp.series(scripts), reload);
+  gulp.watch(['./app/js/*.js'], gulp.series(scripts, vendor), reload);
   gulp.watch(['./app/img/!**!/!*'], reload);
 
   done();
