@@ -1,7 +1,7 @@
 {
-  "name": "integra-judicial-faq",
+  "name": "gulp-project-template",
   "version": "1.0.0",
-  "description": "MINISTERIO PUBLICO DO ESTADO DO RIO DE JANEIRO - Integra Judicial FAQ",
+  "description": "Another gulp project template",
   "main": "gulpfile.babel.js",
   "author": "Tiago de Araujo Fernandes - tiagowhite@gmail.com",
   "license": "ISC",
