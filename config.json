@@ -2,7 +2,12 @@
   "port": "9000",
   "notify": false,
   "base_dir": "./app",
-  "src_folder": ["./app/**/*", "!./app/img/original", "!./app/templates{,/**}", "!./app/data{,/**}"],
+  "src_folder": [
+    "./app/**/*",
+    "!./app/img/original",
+    "!./app/templates{,/**}",
+    "!./app/data{,/**}"
+  ],
   "dist_folder": "./dist/",
   "del_folder": "./dist",
   "templates_src": "./app/**/*.pug",
@@ -12,13 +17,21 @@
   "sass_src": "./app/css/**/*.scss",
   "sass_dest": "./dist/css",
   "css_file_name": "app.min.css",
-  "autoprefixer_options": {"browsers": ["last 3 versions", "ie >= 10", "and_chr >= 2.3"]},
-  "js_src": ["./app/js/*.js", "./app/js/vendor/**/*.js", "./app/js/build/**/*.js"],
+  "js_src": [
+    "./app/js/*.js",
+    "./app/js/vendor/**/*.js",
+    "./app/js/build/**/*.js"
+  ],
   "js_build_src": "./app/js/build/**/*.js",
   "js_vendor_src": "./app/js/vendor/**/*.js",
   "js_file_name": "app.min.js",
   "js_file_name_vendor": "vendor.min.js",
   "js_dest": "./dist/js",
+  "js_vendor_dest": "./dist/js/vendor",
   "img_src": "./app/img/**/*",
-  "img_dest": "./dist/img"
+  "img_dest": "./dist/img",
+  "data_src": "./app/data/**/*",
+  "data_dest": "./dist/data",
+  "video_src": "./app/videos/**/*",
+  "video_dest": "./dist/videos"
 }
